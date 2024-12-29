@@ -51,6 +51,8 @@
   pandoc,
   hyperfine,
   typos,
+  wayland-scanner,
+  wayland-protocols,
 }: let
   # See package.nix. Keep in sync.
   rpathLibs =
@@ -153,6 +155,10 @@ in
         libadwaita
         gtk4
         glib
+
+        # Only needed for libwayland-client builds
+        wayland-scanner
+        wayland-protocols
       ];
 
     # This should be set onto the rpath of the ghostty binary if you want

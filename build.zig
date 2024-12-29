@@ -24,6 +24,8 @@ const XCFrameworkStep = @import("src/build/XCFrameworkStep.zig");
 const Version = @import("src/build/Version.zig");
 const Command = @import("src/Command.zig");
 
+const Scanner = @import("zig_wayland").Scanner;
+
 comptime {
     // This is the required Zig version for building this project. We allow
     // any patch version but the major and minor must match exactly.
@@ -1458,6 +1460,20 @@ fn addDeps(
                     generate_resources_h.extra_file_dependencies = &gresource.dependencies;
                     step.addIncludePath(ghostty_resources_h.dirname());
                 }
+            },
+
+            .wayland => {
+                const scanner = Scanner.create(b, .{});
+                scanner.addSystemProtocol("stable/xdg-shell/xdg-shell.xml");
+
+                scanner.generate("wl_compositor", 1);
+                scanner.generate("wl_shm", 1);
+                scanner.generate("xdg_wm_base", 1);
+
+                const wayland = b.createModule(.{ .root_source_file = scanner.result });
+                step.root_module.addImport("wayland", wayland);
+                step.linkLibC();
+                step.linkSystemLibrary("wayland-client");
             },
         }
     }

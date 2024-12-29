@@ -17,6 +17,7 @@ const structs = @import("apprt/structs.zig");
 pub const action = @import("apprt/action.zig");
 pub const glfw = @import("apprt/glfw.zig");
 pub const gtk = @import("apprt/gtk.zig");
+pub const wayland = @import("apprt/wayland.zig");
 pub const none = @import("apprt/none.zig");
 pub const browser = @import("apprt/browser.zig");
 pub const embedded = @import("apprt/embedded.zig");
@@ -44,6 +45,7 @@ pub const runtime = switch (build_config.artifact) {
         .none => none,
         .glfw => glfw,
         .gtk => gtk,
+        .wayland => wayland,
     },
     .lib => embedded,
     .wasm_module => browser,
@@ -67,6 +69,10 @@ pub const Runtime = enum {
 
     /// GTK-backed. Rich windowed application. GTK is dynamically linked.
     gtk,
+
+    /// Libwayland-client-backed. Very simple. Libwayland-client is statically
+    /// linked. Tabbing and other rich windowing features are not supported.
+    wayland,
 
     pub fn default(target: std.Target) Runtime {
         // The Linux default is GTK because it is full featured.
