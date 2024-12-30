@@ -455,6 +455,10 @@ pub fn surfaceInit(surface: *apprt.Surface) !void {
 
         apprt.glfw => try self.threadEnter(surface),
 
+        apprt.wayland => {
+            // TODO(theonlymrcat): Do this once the window works
+        },
+
         apprt.embedded => {
             // TODO(mitchellh): this does nothing today to allow libghostty
             // to compile for OpenGL targets but libghostty is strictly
@@ -569,6 +573,10 @@ pub fn threadEnter(self: *const OpenGL, surface: *apprt.Surface) !void {
             });
         },
 
+        apprt.wayland => {
+            // TODO(theonlymrcat): I just need this to compile atm
+        },
+
         apprt.embedded => {
             // TODO(mitchellh): this does nothing today to allow libghostty
             // to compile for OpenGL targets but libghostty is strictly
@@ -592,6 +600,10 @@ pub fn threadExit(self: *const OpenGL) void {
         apprt.glfw => {
             gl.glad.unload();
             glfw.makeContextCurrent(null);
+        },
+
+        apprt.wayland => {
+            // TODO(theonlymrcat): I just need this to compile atm
         },
 
         apprt.embedded => {
@@ -2297,6 +2309,9 @@ pub fn drawFrame(self: *OpenGL, surface: *apprt.Surface) !void {
     switch (apprt.runtime) {
         apprt.glfw => surface.window.swapBuffers(),
         apprt.gtk => {},
+        apprt.wayland => {
+            // TODO(theonlymrcat)
+        },
         apprt.embedded => {},
         else => @compileError("unsupported runtime"),
     }
