@@ -10,15 +10,11 @@
   oniguruma,
   zlib,
   libGL,
-  libX11,
-  libXcursor,
-  libXi,
-  libXrandr,
-  glib,
-  gtk4,
-  libadwaita,
-  wrapGAppsHook4,
-  gsettings-desktop-schemas,
+  wayland-scanner,
+  wayland-protocols,
+  wayland,
+  libglvnd,
+  libxkbcommon,
   git,
   ncurses,
   pkg-config,
@@ -26,7 +22,6 @@
   pandoc,
   revision ? "dirty",
   optimize ? "Debug",
-  x11 ? true,
 }: let
   # The Zig hook has no way to select the release type without actual
   # overriding of the default flags.
@@ -41,20 +36,13 @@
 
   # We limit source like this to try and reduce the amount of rebuilds as possible
   # thus we only provide the source that is needed for the build
-  #
-  # NOTE: as of the current moment only linux files are provided,
-  # since darwin support is not finished
   src = lib.fileset.toSource {
     root = ../.;
     fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource ../.)) (
       lib.fileset.unions [
         ../dist/linux
-        ../conformance
         ../images
-        ../include
-        ../pkg
         ../src
-        ../vendor
         ../build.zig
         ../build.zig.zon
         ./build-support/fetch-zig-cache.sh
@@ -78,7 +66,7 @@
 
   zigCache = stdenv.mkDerivation {
     inherit src;
-    name = "ghostty-cache";
+    name = "wraith-cache";
     nativeBuildInputs = [
       git
       zig_hook
@@ -110,7 +98,7 @@
   };
 in
   stdenv.mkDerivation (finalAttrs: {
-    pname = "ghostty";
+    pname = "wraith";
     version = "1.0.1";
     inherit src;
 
@@ -120,38 +108,31 @@ in
       pandoc
       pkg-config
       zig_hook
-      wrapGAppsHook4
+      wayland-scanner
+      wayland-protocols
     ];
 
-    buildInputs =
-      [
-        libGL
-      ]
-      ++ lib.optionals stdenv.hostPlatform.isLinux [
-        bzip2
-        expat
-        fontconfig
-        freetype
-        harfbuzz
-        libpng
-        oniguruma
-        zlib
+    buildInputs = [
+      libGL
 
-        libadwaita
-        gtk4
-        glib
-        gsettings-desktop-schemas
-      ]
-      ++ lib.optionals x11 [
-        libX11
-        libXcursor
-        libXi
-        libXrandr
-      ];
+      bzip2
+      expat
+      fontconfig
+      freetype
+      harfbuzz
+      libpng
+      oniguruma
+      zlib
+
+      libglvnd
+      libxkbcommon
+      wayland
+    ];
 
     dontConfigure = true;
 
-    zigBuildFlags = "-Dversion-string=${finalAttrs.version}-${revision}-nix -Dgtk-x11=${lib.boolToString x11}";
+    # TODO: Add relevant ghostty options to build.zig
+    # zigBuildFlags = "-Dversion-string=${finalAttrs.version}-${revision}-nix";
 
     preBuild = ''
       rm -rf $ZIG_GLOBAL_CACHE_DIR
@@ -197,6 +178,6 @@ in
         "x86_64-linux"
         "aarch64-linux"
       ];
-      mainProgram = "ghostty";
+      mainProgram = "wraith";
     };
   })

@@ -52,12 +52,12 @@
           revision = self.shortRev or self.dirtyShortRev or "dirty";
         };
       in rec {
-        ghostty-debug = pkgs-stable.callPackage ./nix/package.nix (mkArgs "Debug");
-        ghostty-releasesafe = pkgs-stable.callPackage ./nix/package.nix (mkArgs "ReleaseSafe");
-        ghostty-releasefast = pkgs-stable.callPackage ./nix/package.nix (mkArgs "ReleaseFast");
+        wraith-debug = pkgs-stable.callPackage ./nix/package.nix (mkArgs "Debug");
+        wraith-releasesafe = pkgs-stable.callPackage ./nix/package.nix (mkArgs "ReleaseSafe");
+        wraith-releasefast = pkgs-stable.callPackage ./nix/package.nix (mkArgs "ReleaseFast");
 
-        ghostty = ghostty-releasefast;
-        default = ghostty;
+        wraith = wraith-releasefast;
+        default = wraith;
       };
 
       formatter.${system} = pkgs-stable.alejandra;
